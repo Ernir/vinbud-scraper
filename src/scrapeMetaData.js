@@ -9,18 +9,20 @@ var scrapeStockTables = function () {
   var scrapeStoreStock = function (node) {
     var data = {};
     data.store = node.innerText;
-
-    node = node.nextSibling;
-    data.numberInStock = isNaN(parseInt(node.innerText)) ? node.innerText : parseInt(node.innerText);
-
-    return data;
+    
+    if (data.store !== "&nbsp;") { // ToDo: Find out why this still occasionally finds empties.
+        node = node.nextSibling;
+        data.numberInStock = isNaN(parseInt(node.innerText)) ? node.innerText : parseInt(node.innerText);
+        return data;
+    }
+    return null;
   };
 
   var scrapeStockTable = function (stockTable) {
     return {
       region: stockTable.querySelector('th').innerText,
       stores: Array.prototype.slice
-        .call(stockTable.querySelectorAll('td.oddRow.store'))
+        .call(stockTable.querySelectorAll('td.oddRow.store, td.evenRow.store'))
         .map(scrapeStoreStock)
     };
   };
